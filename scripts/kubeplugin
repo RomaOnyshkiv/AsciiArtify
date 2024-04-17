@@ -1,0 +1,25 @@
+#!/bin/bash
+
+RESOURCE_IN=$1
+NAMESPACE_IN=$2
+
+if ! [[ "$1" =~ ^(node|pod)$ ]]; then
+  echo "$1 is not in the list of available arguments. Available : node, pod"
+  exit
+fi
+
+if [ "$NAMESPACE_IN" == "" ]; then
+  echo 'Specify a namespace. Available NSs'
+  kubectl get ns
+  exit
+fi
+echo "type | namespace | name | cpu | memory"
+
+  kubectl top $RESOURCE_IN -n $NAMESPACE_IN | tail -n +2 | while read line; do
+    NAME=$(echo $line | awk '{print $1}')
+    CPU=$(echo $line | awk '{print $2}')
+    MEMORY=$(echo $line | awk '{print $3}')
+
+    echo "$RESOURCE_IN | $NAMESPACE_IN | $NAME | $CPU | $MEMORY"
+  
+done
